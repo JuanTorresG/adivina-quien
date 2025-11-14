@@ -31,7 +31,7 @@ export const questions: Question[] = [
     {
         id: "q_energy",
         text: "¿Tiene un nivel de energía alto?",
-        factKey: "answer_high_energy", // nota: se mantiene este nombre para compatibilidad con UI
+        factKey: "answer_high_energy",
         type: "YES_NO"
     },
     {
@@ -106,8 +106,6 @@ export const questions: Question[] = [
         factKey: "answer_has_predisposition",
         type: "YES_NO"
     },
-
-    // Pregunta extra para distinguir razas similares (p. ej. Birmano vs Abisinio)
     {
         id: "q_rasgos_fisicos",
         text: "¿Qué rasgos físicos destacas? (elige la opción que más se acerque)",
@@ -122,4 +120,4 @@ export const questions: Question[] = [
             { text: "Otro / no sé", value: "otro" }
         ]
     },
-];
+] as const;

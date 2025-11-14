@@ -356,4 +356,4 @@ export const rules: RuleProperties[] = [
         },
         event: { type: "score", params: { reason: "predisposición buscada no coincide", weight: -6 } }
     }
-];
+] as const;

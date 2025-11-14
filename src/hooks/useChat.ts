@@ -1,12 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { AppFact, Breed, GamePhase, Message, Question, Sender } from "../types";
-import type { Engine } from "json-rules-engine";
-import { breeds } from "../data/breeds";
-import { createEngine } from "../engine/engine";
+import type { AppFact, Breed, EngineEvent, GamePhase, Message, Question, Sender } from "../types";
+import { breeds as defaultBreeds } from "../data/breeds";
+import { createEngine as createEngineDefault } from "../engine/engine";
 import { questions } from "../data/questions";
-import { buildBucketsForQuestion, scoreBuckets } from "../helpers";
+import { buildBucketsForQuestion } from "../helpers/buildBucketsForQuestion";
+import { scoreBuckets } from "../helpers/scoreBuckets";
+import { fastFilterForFacts } from "../helpers/fastFilter";
+import type { Engine } from "json-rules-engine";
+import { formatAnswer } from "../helpers/formatAnswer";
 
-export const useChat = () => {
+export const useChat = (opts?: { initialBreeds?: Breed[]; engine?: Engine | null }) => {
+    const initialBreeds = opts?.initialBreeds ?? defaultBreeds;
+    const engineRef = useRef(opts?.engine ?? createEngineDefault());
+
     const [messages, setMessages] = useState<Message[]>([
         {
             id: 1,
@@ -14,58 +20,57 @@ export const useChat = () => {
             sender: "cpu",
         },
     ]);
-
     const messageIdRef = useRef(2);
+
     const [cpuFacts, setCpuFacts] = useState<AppFact>({});
-    const inProgressRef = useRef<boolean>(false);
-    const [possibleBreeds, setPossibleBreeds] = useState<Breed[]>(breeds);
+    const [possibleBreeds, setPossibleBreeds] = useState<Breed[]>(initialBreeds);
     const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
     const [isCpuThinking, setIsCpuThinking] = useState(false);
     const [gamePhase, setGamePhase] = useState<GamePhase>("playing");
-    const engineRef = useRef<Engine>(createEngine());
+
     const askedQuestionsRef = useRef<Set<string>>(new Set());
-    const hasGuessedRef = useRef<boolean>(false);
+    const inProgressRef = useRef(false);
+    const hasGuessedRef = useRef(false);
     const currentQuestionRef = useRef<Question | null>(null);
+    const cacheRef = useRef<Map<string, unknown>>(new Map());
 
     const addMessage = useCallback((text: string, sender: Sender) => {
         const id = messageIdRef.current++;
         setMessages((prev) => [...prev, { id, text, sender }]);
     }, []);
 
-    const chooseNextQuestion = useCallback((facts: AppFact | undefined, possibleBreeds: Breed[], questions: Question[]) => {
+    const fingerprintFacts = (breed: Breed, facts: AppFact) => `${breed.name}::${JSON.stringify(facts, Object.keys(facts).sort((a, b) => a.localeCompare(b)))}`;
+
+    const chooseNextQuestion = useCallback((facts: AppFact | undefined, possible: Breed[], questionsList: Question[]) => {
         const factsObj = facts ?? {};
-        const unanswered = questions.filter((q) => !(q.factKey in factsObj) && !askedQuestionsRef.current.has(q.factKey));
+        const unanswered = questionsList.filter((q) => !(q.factKey in factsObj) && !askedQuestionsRef.current.has(q.factKey));
         if (unanswered.length === 0) return null;
 
         let best: Question | null = null;
         let bestScore = Infinity;
 
         for (const q of unanswered) {
-            const buckets = buildBucketsForQuestion(q, possibleBreeds);
+            const buckets = buildBucketsForQuestion(q, possible);
             const score = scoreBuckets(buckets);
-
             if (score < bestScore) {
                 bestScore = score;
                 best = q;
             }
         }
         return best;
-    },
-        []
-    );
+    }, []);
 
     const askNextQuestion = useCallback(() => {
         if (inProgressRef.current) return;
         inProgressRef.current = true;
-        console.debug('runRulesEngine finished', { survivingCount: possibleBreeds.length, currentQuestion: currentQuestionRef.current?.factKey });
-
         try {
-            if (gamePhase !== 'playing' || hasGuessedRef.current || currentQuestionRef.current) return;
+            if (gamePhase !== "playing" || hasGuessedRef.current || currentQuestionRef.current) return;
+
             if (possibleBreeds.length === 1) {
                 if (!hasGuessedRef.current) {
                     hasGuessedRef.current = true;
-                    setGamePhase('guessing');
-                    addMessage(`¿Estás pensando en... **${possibleBreeds[0].name}**?`, 'cpu');
+                    setGamePhase("guessing");
+                    addMessage(`¿Estás pensando en... **${possibleBreeds[0].name}**?`, "cpu");
                 }
                 return;
             }
@@ -74,114 +79,96 @@ export const useChat = () => {
             if (!next) {
                 if (!hasGuessedRef.current) {
                     hasGuessedRef.current = true;
-                    setIsCpuThinking(false);
-                    addMessage('Creo que ya no tengo más preguntas útiles. Voy a intentar adivinar...', 'cpu');
+                    addMessage("Creo que ya no tengo más preguntas útiles. Voy a intentar adivinar...", "cpu");
                     if (possibleBreeds.length > 0) {
-                        setGamePhase('guessing');
-                        addMessage(`¿Estás pensando en... **${possibleBreeds[0].name}**?`, 'cpu');
+                        setGamePhase("guessing");
+                        addMessage(`¿Estás pensando en... **${possibleBreeds[0].name}**?`, "cpu");
                     } else {
-                        setGamePhase('over');
-                        addMessage('No encontré coincidencias. ¿Quieres reiniciar?', 'cpu');
+                        setGamePhase("over");
+                        addMessage("No encontré coincidencias. ¿Quieres reiniciar?", "cpu");
                     }
                 }
                 return;
             }
 
-            // marcar y mostrar pregunta
             askedQuestionsRef.current.add(next.factKey);
             currentQuestionRef.current = next;
             setCurrentQuestion(next);
             setIsCpuThinking(false);
-            addMessage(next.text, 'cpu');
+            addMessage(next.text, "cpu");
         } finally {
-            // liberar guard al final (importante)
             inProgressRef.current = false;
         }
-    }, [chooseNextQuestion, cpuFacts, possibleBreeds, gamePhase, addMessage]);
+    }, [cpuFacts, possibleBreeds, gamePhase, addMessage, chooseNextQuestion]);
 
     const runRulesEngine = useCallback(async (facts: AppFact) => {
-        console.debug('askNextQuestion start', { inProgress: inProgressRef.current, currentQuestion: currentQuestionRef.current?.factKey, hasGuessed: hasGuessedRef.current, possibleCount: possibleBreeds.length });
-
         if (!engineRef.current) return;
-
         setIsCpuThinking(true);
 
-        const evaluations = await Promise.all(
-            possibleBreeds.map(async (breed) => {
-                const combined = { ...breed, ...facts };
+        const fastFiltered = fastFilterForFacts(possibleBreeds, facts);
 
+        const engine = engineRef.current;
+        const evaluations = await Promise.all(
+            fastFiltered.map(async (breed) => {
+                const key = fingerprintFacts(breed, facts);
+                if (cacheRef.current.has(key)) return { breed, events: cacheRef.current.get(key) };
                 try {
-                    const res = await engineRef.current.run(combined);
-                    return { breed, events: res.events ?? [] };
+                    const res = await engine.run({ ...breed, ...facts });
+                    const ev = res?.events ?? [];
+                    cacheRef.current.set(key, ev);
+                    return { breed, events: ev };
                 } catch (err) {
-                    console.error("Error evaluating breed:", err);
+                    console.error("engine.run error:", err);
+                    cacheRef.current.set(key, []);
                     return { breed, events: [] };
                 }
             })
         );
 
-        const surviving = evaluations
+        const survivors = evaluations
             .filter((e) => {
-                const hasNegative = e.events.some(
-                    (ev) =>
-                        typeof ev.params?.weight === "number" && ev.params.weight < 0
+                const events = e.events as EngineEvent[];
+                return !events.some((ev) =>
+                    typeof ev.params?.weight === "number" && ev.params.weight < 0
                 );
-                return !hasNegative;
             })
             .map((e) => e.breed);
 
-        setPossibleBreeds(surviving);
+        setPossibleBreeds(survivors);
+        setIsCpuThinking(false);
 
-        setTimeout(() => {
-            setIsCpuThinking(false);
-            if (surviving.length === 0) {
-                if (!hasGuessedRef.current) {
-                    addMessage(
-                        "No se encontraron coincidencias, quieres jugar de nuevo?",
-                        "cpu"
-                    );
-                    setGamePhase("over");
-                    hasGuessedRef.current = true;
-                }
-            } else if (surviving.length === 1) {
-                if (!hasGuessedRef.current) {
-                    hasGuessedRef.current = true;
-                    setGamePhase("guessing");
-                    addMessage(`¿Estás pensando en ${surviving[0].name}?`, "cpu");
-                }
-            } else if (!currentQuestionRef.current && !inProgressRef.current) askNextQuestion();
+        if (survivors.length === 0) {
+            if (!hasGuessedRef.current) {
+                addMessage("No encontré coincidencias. ¿Quieres reiniciar?", "cpu");
+                hasGuessedRef.current = true;
+                setGamePhase("over");
+            }
+        } else if (survivors.length === 1) {
+            if (!hasGuessedRef.current) {
+                hasGuessedRef.current = true;
+                setGamePhase("guessing");
+                addMessage(`¿Estás pensando en ${survivors[0].name}?`, "cpu");
+            }
+        }
+    }, [possibleBreeds, addMessage]);
 
+    const handleUserAnswer = useCallback(async (question: Question, value: boolean | string) => {
+        if (isCpuThinking) return;
 
-        }, 500);
-    },
-        [possibleBreeds, askNextQuestion, addMessage]
-    );
+        currentQuestionRef.current = null;
+        setCurrentQuestion(null);
 
-    const handleUserAnswer = useCallback(
-        async (question: Question, value: boolean | string) => {
-            if (isCpuThinking) return;
+        const userText = formatAnswer(question, value);
 
-            currentQuestionRef.current = null;
-            setCurrentQuestion(null);
+        addMessage(userText, "user");
 
-            const userText =
-                question.type === "YES_NO"
-                    ? value
-                        ? "Sí"
-                        : "No"
-                    : question.options?.find((opt) => opt.value === value)?.text || String(value);
+        const newFacts = { ...cpuFacts, [question.factKey]: value };
+        setCpuFacts(newFacts);
 
-            addMessage(userText, "user");
+        await runRulesEngine(newFacts);
 
-            const newFactKey: AppFact = { ...cpuFacts, [question.factKey]: value };
-            setCpuFacts(newFactKey);
-
-            await runRulesEngine(newFactKey);
-
-            askNextQuestion();
-        },
-        [cpuFacts, isCpuThinking, addMessage, runRulesEngine, askNextQuestion]
-    );
+        askNextQuestion();
+    }, [cpuFacts, isCpuThinking, addMessage, runRulesEngine, askNextQuestion]);
 
     const onGuestAnswer = useCallback((value: boolean) => {
         if (value) {
@@ -189,24 +176,18 @@ export const useChat = () => {
             setGamePhase("over");
         } else {
             addMessage("Vaya, no he adivinado tu mascota. ¡Bien jugado!", "cpu");
-
-            setPossibleBreeds((prev) => {
-                const [, ...rest] = prev;
-                return rest;
-            });
-
+            setPossibleBreeds((prev) => prev.slice(1));
             hasGuessedRef.current = false;
             setGamePhase("playing");
-            setTimeout(() => askNextQuestion(), 1000);
+            setTimeout(() => askNextQuestion(), 500);
         }
-    },
-        [askNextQuestion, addMessage]
-    );
+    }, [askNextQuestion, addMessage]);
 
     const restartGame = useCallback(() => {
         askedQuestionsRef.current.clear();
         hasGuessedRef.current = false;
         currentQuestionRef.current = null;
+        cacheRef.current.clear();
         setMessages([
             {
                 id: 1,
@@ -216,29 +197,23 @@ export const useChat = () => {
         ]);
         messageIdRef.current = 2;
         setCpuFacts({});
-        setPossibleBreeds(breeds);
+        setPossibleBreeds(initialBreeds);
         setCurrentQuestion(null);
         setIsCpuThinking(false);
         setGamePhase("playing");
-        setTimeout(() => askNextQuestion(), 1000);
-    }, [askNextQuestion]);
+        setTimeout(() => askNextQuestion(), 600);
+    }, [askNextQuestion, initialBreeds]);
 
     useEffect(() => {
-        const t = setTimeout(() => {
-            askNextQuestion();
-        }, 1000);
-
+        const t = setTimeout(() => askNextQuestion(), 600);
         return () => clearTimeout(t);
     }, [askNextQuestion]);
 
     return {
-        // State
         messages,
         isCpuThinking,
         gamePhase,
         currentQuestion,
-
-        // Actions
         restartGame,
         handleUserAnswer,
         onGuestAnswer,

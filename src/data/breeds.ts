@@ -718,4 +718,4 @@ export const breeds: Breed[] = [
         origen: "EE.UU. (cruce con serval)",
         rasgos_fisicos: "Aspecto moteado, tamaño grande, apariencia salvaje."
     }
-];
+] as const;

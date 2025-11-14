@@ -1,7 +1,12 @@
+import { breeds } from '../data/breeds';
+import { createEngine } from '../engine/engine';
 import { useChat } from '../hooks/useChat';
 
+const engine = createEngine();
+
 export const Chat = () => {
-    const { currentQuestion, gamePhase, handleUserAnswer, isCpuThinking, messages, restartGame, onGuestAnswer } = useChat();
+
+    const { currentQuestion, gamePhase, handleUserAnswer, isCpuThinking, messages, restartGame, onGuestAnswer } = useChat({ engine, initialBreeds: breeds });
 
     return (
         <div className="flex flex-col h-full bg-white/30 backdrop-blur-sm border border-white/50 rounded-2xl shadow-lg overflow-hidden">
