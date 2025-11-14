@@ -1,0 +1,1 @@
+export const normalizeKey = (factKey: string) => factKey.replace(/^answer_/, '');
