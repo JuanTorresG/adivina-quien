@@ -26,6 +26,7 @@ export interface Breed {
     inteligencia?: number;
     vocalizacion?: number;
     acepta_otras_mascotas?: number;
+    color?: string;
 }
 export type Categoria = "gato" | "perro";
 export type EngineEvent = { params?: { weight?: number } };

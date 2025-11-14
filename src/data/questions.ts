@@ -66,7 +66,7 @@ export const questions: Question[] = [
     },
     {
         id: "q_grooming",
-        text: "¿Necesita grooming frecuente?",
+        text: "¿Necesita aseo frecuente?",
         factKey: "answer_high_grooming",
         type: "YES_NO"
     },

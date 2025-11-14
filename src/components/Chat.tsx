@@ -1,12 +1,16 @@
-import { breeds } from '../data/breeds';
-import { createEngine } from '../engine/engine';
-import { useChat } from '../hooks/useChat';
+import type { GamePhase, Message, Question } from '../types';
 
-const engine = createEngine();
-
-export const Chat = () => {
-
-    const { currentQuestion, gamePhase, handleUserAnswer, isCpuThinking, messages, restartGame, onGuestAnswer } = useChat({ engine, initialBreeds: breeds });
+interface Props {
+    currentQuestion: Question | null;
+    gamePhase: GamePhase;
+    handleUserAnswer: (question: Question, value: boolean | string) => Promise<void>;
+    isCpuThinking: boolean;
+    messages: Message[];
+    restartGame: () => void;
+    onGuestAnswer: (value: boolean) => void;
+}
+export const Chat = (props: Props) => {
+    const { currentQuestion, gamePhase, handleUserAnswer, isCpuThinking, messages, restartGame, onGuestAnswer } = props;
 
     return (
         <div className="flex flex-col h-full bg-white/30 backdrop-blur-sm border border-white/50 rounded-2xl shadow-lg overflow-hidden">

@@ -217,5 +217,6 @@ export const useChat = (opts?: { initialBreeds?: Breed[]; engine?: Engine | null
         restartGame,
         handleUserAnswer,
         onGuestAnswer,
+        possibleBreeds,
     };
 };
