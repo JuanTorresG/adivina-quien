@@ -1,11 +1,13 @@
 import { Board } from './components/Board';
 import { Chat } from './components/Chat';
-import { breeds } from './data/breeds';
+import { breeds } from "./data/breeds";
 import { createEngine } from './engine/engine';
 import { useChat } from './hooks/useChat';
 
 const engine = createEngine();
 
+console.log(`Loaded ${breeds.length} breeds into the engine.`);
+console.log(breeds);
 const App = () => {
   const { currentQuestion, gamePhase, handleUserAnswer, isCpuThinking, messages, restartGame, onGuestAnswer, possibleBreeds } = useChat({ engine, initialBreeds: breeds });
 
