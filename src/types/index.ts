@@ -50,12 +50,15 @@ export interface Breed {
 
 export type EngineEvent = { params?: { weight?: number } };
 
-export interface Question {
+export type Question = {
     id: string;
-    text: string;
     factKey: string;
-    type: QuestionType;
-    options?: Option[];
+    text: string;
+    type: "CHOICE" | "YESNO" | "OPEN";
+    options?: { text: string; value: string }[];
+    priority?: number;
+    appliesTo?: "perro" | "gato" | "both";
+    mandatory?: boolean;
 }
 
 export type BreedValue = number | boolean | string | string[] | undefined;

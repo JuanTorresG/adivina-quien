@@ -38,7 +38,7 @@ export const Chat = (props: Props) => {
     }, [messages.length, isCpuThinking]);
 
     return (
-        <div className="flex flex-col h-96 bg-white/30 backdrop-blur-sm border border-white/50 rounded-2xl shadow-lg overflow-hidden">
+        <div className="flex flex-col h-4/5 bg-white/30 backdrop-blur-sm border border-white/50 rounded-2xl shadow-lg overflow-hidden">
             <div className="p-4 border-b border-white/50">
                 <h2 className="text-xl font-bold text-slate-800 text-center">Adivina quien</h2>
             </div>

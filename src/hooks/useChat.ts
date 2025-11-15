@@ -59,40 +59,52 @@ export const useChat = (opts?: { initialBreeds?: Breed[]; engine?: Engine | null
     const chooseNextQuestion = useCallback(
         (facts: AppFact | undefined, possible: Breed[], questionsList: Question[]) => {
             const factsObj = facts ?? {};
-            const unanswered = questionsList.filter(
-                (q) => !(q.factKey in factsObj) && !askedQuestionsRef.current.has(q.factKey)
-            );
-            if (unanswered.length === 0) return null;
-            if (possible.length === 0) return null;
 
-            let best: Question | null = null;
+            // 1) Si hay alguna pregunta mandatory sin responder -> devolverla (ej: categoria)
+            const mandatory = questionsList.find(q => q.mandatory && !(q.factKey in factsObj));
+            if (mandatory) return mandatory;
+
+            // 2) Filtrar preguntas no respondidas y aplicables a la categoría (si ya sabemos)
+            const category = factsObj["answer_categoria"] as string | undefined;
+            const unanswered = questionsList.filter(
+                (q) =>
+                    !(q.factKey in factsObj) &&
+                    !askedQuestionsRef.current.has(q.factKey) &&
+                    (q.appliesTo === undefined || q.appliesTo === "both" || !category || q.appliesTo === category)
+            );
+            if (unanswered.length === 0 || possible.length === 0) return null;
+
+            // 3) Ordenar por priority cuando exista, luego por scoreBuckets
+            // Precompute buckets if needed
+            let best = null;
             let bestScore = Infinity;
-            const total = possible.length;
 
             for (const q of unanswered) {
-                const buckets = buildBucketsForQuestion(q, possible);
-                const nonUnknownSum = Object.entries(buckets).reduce((acc, [k, v]) => {
-                    return k === "unknown" ? acc : acc + v;
-                }, 0);
+                // if priority is specified, use it as initial bias
+                const priorityBias = typeof q.priority === "number" ? q.priority : 0;
 
+                const buckets = buildBucketsForQuestion(q, possible);
+                const nonUnknownSum = Object.entries(buckets).reduce((acc, [k, v]) => k === "unknown" ? acc : acc + v, 0);
                 if (nonUnknownSum === 0) continue;
+
+                // skip non-splitting questions
                 let maxNonUnknown = 0;
                 for (const [k, v] of Object.entries(buckets)) {
                     if (k === "unknown") continue;
                     if (v > maxNonUnknown) maxNonUnknown = v;
                 }
-                if (maxNonUnknown === nonUnknownSum && nonUnknownSum === total) continue;
+                if (maxNonUnknown === nonUnknownSum && nonUnknownSum === possible.length) continue;
 
-                const score = scoreBuckets(buckets);
-                if (score < bestScore) {
-                    bestScore = score;
+                const infoScore = scoreBuckets(buckets); // menor = mejor
+                const combined = infoScore + priorityBias * 0.1; // pequeño peso a priority (ajusta si quieres)
+                if (combined < bestScore) {
+                    bestScore = combined;
                     best = q;
                 }
             }
 
             return best;
-        },
-        []
+        }, []
     );
     const askNextQuestion = useCallback(() => {
         if (inProgressRef.current) return;

@@ -1,7 +1,10 @@
 export const scoreBuckets = (buckets: Record<string, number>): number => {
-    const vals = Object.values(buckets);
-    if (vals.length === 0) return Infinity;
-    const maxBucket = Math.max(...vals);
-    const unknownCount = buckets["unknown"] || 0;
-    return maxBucket + unknownCount * 0.5;
+    const total = Object.values(buckets).reduce((a, b) => a + b, 0);
+    let e = 0;
+    for (const v of Object.values(buckets)) {
+        if (v === 0) continue;
+        const p = v / total;
+        e -= p * Math.log2(p);
+    }
+    return e;
 };
