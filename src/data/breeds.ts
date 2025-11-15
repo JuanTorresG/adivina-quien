@@ -410,7 +410,7 @@ export const breeds: Breed[] = [
         ],
         esperanza_vida: null,
         origen: "Reino Unido (Escocia)",
-        rasgos_fisicos: ["Hocico largo", "Pelaje abundante y sedoso"],
+        rasgos_fisicos: ["hocico largo", "pelaje abundante y sedoso"],
         grupo: "Herding",
         acepta_otras_mascotas: "muy alto",
         rasgos_tags: [],

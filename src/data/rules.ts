@@ -247,6 +247,7 @@ export const rules: RuleProperties[] = [
         conditions: {
             all: [
                 { fact: "answer_ejercicio_horas", operator: "notEqual", value: "" },
+                { fact: "answer_ejercicio_horas", operator: "notEqual", value: "unknown" },
                 { fact: "ejercicio_horas", operator: "contains", value: { fact: "answer_ejercicio_horas" } }
             ]
         },
@@ -358,6 +359,7 @@ export const rules: RuleProperties[] = [
         conditions: {
             all: [
                 { fact: "answer_rasgo_tag", operator: "notEqual", value: "" },
+                { fact: "answer_rasgo_tag", operator: "notEqual", value: "unknown" },
                 { fact: "rasgos_tags", operator: "contains", value: { fact: "answer_rasgo_tag" } }
             ]
         },
@@ -368,6 +370,7 @@ export const rules: RuleProperties[] = [
         conditions: {
             all: [
                 { fact: "answer_rasgos_fisicos", operator: "notEqual", value: "" },
+                { fact: "answer_rasgos_fisicos", operator: "notEqual", value: "unknown" },
                 { fact: "rasgos_fisicos", operator: "contains", value: { fact: "answer_rasgos_fisicos" } }
             ]
         },
@@ -378,6 +381,8 @@ export const rules: RuleProperties[] = [
         conditions: {
             all: [
                 { fact: "answer_tiene_predisposicion", operator: "equal", value: true },
+                { fact: "answer_predisposicion_nombre", operator: "notEqual", value: "" },
+                { fact: "answer_predisposicion_nombre", operator: "notEqual", value: "unknown" },
                 {
                     fact: "predisposiciones_salud",
                     operator: "contains",
@@ -392,6 +397,8 @@ export const rules: RuleProperties[] = [
         conditions: {
             all: [
                 { fact: "answer_tiene_predisposicion", operator: "equal", value: true },
+                { fact: "answer_predisposicion_nombre", operator: "notEqual", value: "" },
+                { fact: "answer_predisposicion_nombre", operator: "notEqual", value: "unknown" },
                 {
                     not: {
                         fact: "predisposiciones_salud",
@@ -458,6 +465,7 @@ export const rules: RuleProperties[] = [
         conditions: {
             all: [
                 { fact: "answer_origen", operator: "notEqual", value: "" },
+                { fact: "answer_origen", operator: "notEqual", value: "unknown" },
                 { fact: "origen", operator: "contains", value: { fact: "answer_origen" } }
             ]
         },
@@ -468,6 +476,7 @@ export const rules: RuleProperties[] = [
         conditions: {
             all: [
                 { fact: "answer_color", operator: "notEqual", value: "" },
+                { fact: "answer_color", operator: "notEqual", value: "unknown" },
                 { fact: "color", operator: "contains", value: { fact: "answer_color" } }
             ]
         },
@@ -478,6 +487,7 @@ export const rules: RuleProperties[] = [
         conditions: {
             all: [
                 { fact: "answer_grupo", operator: "notEqual", value: "" },
+                { fact: "answer_grupo", operator: "notEqual", value: "unknown" },
                 { fact: "grupo", operator: "contains", value: { fact: "answer_grupo" } }
             ]
         },
@@ -488,6 +498,7 @@ export const rules: RuleProperties[] = [
         conditions: {
             all: [
                 { fact: "answer_temperamento_keyword", operator: "notEqual", value: "" },
+                { fact: "answer_temperamento_keyword", operator: "notEqual", value: "unknown" },
                 { fact: "temperamento", operator: "contains", value: { fact: "answer_temperamento_keyword" } }
             ]
         },
@@ -498,6 +509,7 @@ export const rules: RuleProperties[] = [
         conditions: {
             all: [
                 { fact: "answer_comportamiento_keyword", operator: "notEqual", value: "" },
+                { fact: "answer_comportamiento_keyword", operator: "notEqual", value: "unknown" },
                 { fact: "comportamiento", operator: "contains", value: { fact: "answer_comportamiento_keyword" } }
             ]
         },

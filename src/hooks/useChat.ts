@@ -16,18 +16,14 @@ import { scoreBuckets } from "../helpers/scoreBuckets";
 import { fastFilterForFacts } from "../helpers/fastFilter";
 import type { Engine } from "json-rules-engine";
 import { formatAnswer } from "../helpers/formatAnswer";
+import { resolveAnswerValue } from "../helpers/resolveAnswerValue";
+import { getBestPhysicalTrait } from '../helpers/getBestPhysicalTrait';
 
 export const useChat = (opts?: { initialBreeds?: Breed[]; engine?: Engine | null }) => {
     const initialBreeds = opts?.initialBreeds ?? defaultBreeds;
     const engineRef = useRef<Engine | null>(opts?.engine ?? createEngineDefault());
 
-    const [messages, setMessages] = useState<Message[]>([
-        {
-            id: 1,
-            text: "¡Hola! Piensa en una mascota (una de las del tablero) y yo te haré preguntas para adivinarla.",
-            sender: "cpu",
-        },
-    ]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const messageIdRef = useRef<number>(2);
 
     const [cpuFacts, setCpuFacts] = useState<AppFact>({});
@@ -60,11 +56,9 @@ export const useChat = (opts?: { initialBreeds?: Breed[]; engine?: Engine | null
         (facts: AppFact | undefined, possible: Breed[], questionsList: Question[]) => {
             const factsObj = facts ?? {};
 
-            // 1) Si hay alguna pregunta mandatory sin responder -> devolverla (ej: categoria)
             const mandatory = questionsList.find(q => q.mandatory && !(q.factKey in factsObj));
             if (mandatory) return mandatory;
 
-            // 2) Filtrar preguntas no respondidas y aplicables a la categoría (si ya sabemos)
             const category = factsObj["answer_categoria"] as string | undefined;
             const unanswered = questionsList.filter(
                 (q) =>
@@ -74,20 +68,16 @@ export const useChat = (opts?: { initialBreeds?: Breed[]; engine?: Engine | null
             );
             if (unanswered.length === 0 || possible.length === 0) return null;
 
-            // 3) Ordenar por priority cuando exista, luego por scoreBuckets
-            // Precompute buckets if needed
-            let best = null;
+            let best: Question | null = null;
             let bestScore = Infinity;
 
             for (const q of unanswered) {
-                // if priority is specified, use it as initial bias
                 const priorityBias = typeof q.priority === "number" ? q.priority : 0;
 
                 const buckets = buildBucketsForQuestion(q, possible);
                 const nonUnknownSum = Object.entries(buckets).reduce((acc, [k, v]) => k === "unknown" ? acc : acc + v, 0);
                 if (nonUnknownSum === 0) continue;
 
-                // skip non-splitting questions
                 let maxNonUnknown = 0;
                 for (const [k, v] of Object.entries(buckets)) {
                     if (k === "unknown") continue;
@@ -95,17 +85,36 @@ export const useChat = (opts?: { initialBreeds?: Breed[]; engine?: Engine | null
                 }
                 if (maxNonUnknown === nonUnknownSum && nonUnknownSum === possible.length) continue;
 
-                const infoScore = scoreBuckets(buckets); // menor = mejor
-                const combined = infoScore + priorityBias * 0.1; // pequeño peso a priority (ajusta si quieres)
+                const infoScore = scoreBuckets(buckets);
+                const combined = infoScore + priorityBias * 0.1;
                 if (combined < bestScore) {
                     bestScore = combined;
                     best = q;
                 }
             }
 
+            if (!best) return null;
+
+            if (best.factKey === "answer_rasgos_fisicos") {
+                const trait = getBestPhysicalTrait(possible);
+                if (trait) {
+                    const dynamicQuestion: Question & { dynamicTrait?: string } = {
+                        id: "q_rasgo_fisico_dinamico",
+                        text: `${trait.replace(/_/g, " ")}?`,
+                        factKey: best.factKey,
+                        type: "YESNO",
+                        priority: best.priority,
+                        appliesTo: best.appliesTo,
+                        dynamicTrait: trait
+                    };
+                    return dynamicQuestion;
+                }
+            }
+
             return best;
         }, []
     );
+
     const askNextQuestion = useCallback(() => {
         if (inProgressRef.current) return;
         inProgressRef.current = true;
@@ -200,22 +209,47 @@ export const useChat = (opts?: { initialBreeds?: Breed[]; engine?: Engine | null
         }
     }, [possibleBreeds, fingerprintFacts]);
 
-    const handleUserAnswer = useCallback(async (question: Question, value: boolean | string) => {
+    const handleUserAnswer = useCallback(async (question: Question & { dynamicTrait?: string }, value: boolean | string) => {
         if (isCpuThinking) return;
 
         currentQuestionRef.current = null;
         setCurrentQuestion(null);
 
-        const userText = formatAnswer(question, value);
+        if (question.id === "q_rasgo_fisico_dinamico" && question.dynamicTrait) {
+            const trait = question.dynamicTrait;
+            const factValue = value === true ? trait : `!${trait}`;
+
+            addMessage(value === true ? "Sí" : "No", "user");
+
+            askedQuestionsRef.current.add(question.factKey);
+
+            setCpuFacts((prevFacts) => {
+                const newFacts = { ...prevFacts, [question.factKey]: factValue };
+                (async () => { await runRulesEngine(newFacts); })();
+                return newFacts;
+            });
+            return;
+        }
+
+        const factValue = resolveAnswerValue(question, value);
+
+        let userText = "";
+        if (typeof factValue === "string" && factValue === "") {
+            userText = "No sé";
+        } else if (question.type === "YESNO") {
+            userText = (typeof factValue === "boolean") ? (factValue ? "Sí" : "No") : formatAnswer(question, value);
+        } else {
+            userText = formatAnswer(question, factValue);
+        }
+
         addMessage(userText, "user");
+        askedQuestionsRef.current.add(question.factKey);
 
         setCpuFacts((prevFacts) => {
-            const newFacts = { ...prevFacts, [question.factKey]: value };
+            const newFacts = { ...prevFacts, [question.factKey]: factValue };
             (async () => { await runRulesEngine(newFacts); })();
             return newFacts;
         });
-
-        askedQuestionsRef.current.add(question.factKey);
 
     }, [isCpuThinking, addMessage, runRulesEngine]);
 

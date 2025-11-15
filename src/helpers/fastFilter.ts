@@ -43,32 +43,53 @@ export const fastFilterForFacts = (pool: Breed[], facts: AppFact): Breed[] => {
 
     const matches = (breed: Breed, factKey: string, v: unknown): boolean => {
         const val = getBreedValue(breed, factKey);
+
         if (typeof v === "boolean") {
             return checkBoolean(val, v);
         }
+
         if (typeof v === "string") {
             if (v === "") return true;
+
+            // NEGACIÓN: "!trait" -> true only if breed DOES NOT have trait
+            if (v.startsWith("!")) {
+                const want = v.slice(1).trim();
+                return !checkString(val, want);
+            }
+
+            // OR (p.ej. "pequeño/mediano")
+            if (v.includes("/")) {
+                const parts = v.split("/").map(p => p.trim()).filter(Boolean);
+                return parts.some(p => checkString(val, p));
+            }
+
             if (factKey === "answer_predisposicion_nombre" || factKey === "answer_predisposition_name") {
                 if (!Array.isArray(val)) return false;
                 return val.some((p) => normalize(p).includes(normalize(v)));
             }
+
             if (factKey === "answer_rasgo_tag") {
                 return checkString(val, v);
             }
+
             if (factKey === "answer_rasgos_fisicos") {
                 return checkString(val, v);
             }
+
             if (factKey === "answer_ejercicio_horas") {
                 return checkString(val, v);
             }
+
             return checkString(val, v);
         }
+
         if (typeof v === "number") {
             if (isEsperanzaVida(val)) {
                 return val.a >= v;
             }
             return false;
         }
+
         return true;
     };
 
@@ -79,3 +100,5 @@ export const fastFilterForFacts = (pool: Breed[], facts: AppFact): Breed[] => {
         return true;
     });
 };
+
+export default fastFilterForFacts;

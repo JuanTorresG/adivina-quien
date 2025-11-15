@@ -51,23 +51,6 @@ export const questions: Question[] = [
         appliesTo: "both"
     },
     {
-        id: "q_pelo",
-        text: "¿Qué tipo de pelaje tiene?",
-        factKey: "answer_pelo",
-        type: "CHOICE",
-        options: [
-            { text: "Corto y liso", value: "corto" },
-            { text: "Semilargo / sedoso", value: "semilargo" },
-            { text: "Largo / abundante", value: "largo" },
-            { text: "Rizado / lanoso", value: "rizado" },
-            { text: "Sin pelo", value: "sin_pelo" },
-            { text: "No sé / Indiferente", value: "" }
-        ],
-        priority: 3,
-        appliesTo: "both"
-    },
-
-    {
         id: "q_hipo",
         text: "¿Es hipoalergénico?",
         factKey: "answer_hipoalergenico",
@@ -283,7 +266,7 @@ export const questions: Question[] = [
         factKey: "answer_color",
         type: "CHOICE",
         options: [
-            { text: "No importa", value: "" },
+
             { text: "Tricolor / Multicolor", value: "tricolor" },
             { text: "Manto dorado / amarillo", value: "dorado" },
             { text: "Negro", value: "negro" },
@@ -299,7 +282,7 @@ export const questions: Question[] = [
         factKey: "answer_grupo",
         type: "CHOICE",
         options: [
-            { text: "No importa", value: "" },
+
             { text: "Herding (pastoreo)", value: "Herding" },
             { text: "Sporting", value: "Sporting" },
             { text: "Hound", value: "Hound" },
@@ -326,5 +309,3 @@ export const questions: Question[] = [
         appliesTo: "perro"
     }
 ] as const;
-
-export default questions;
