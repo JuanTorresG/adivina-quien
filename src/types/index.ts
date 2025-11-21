@@ -1,9 +1,7 @@
 export type Size =
-    | "pequeño/mediano"
     | "pequeño"
     | "mediano"
     | "grande"
-    | "mediano/grande"
     | "muy grande"
     | "gigante";
 
@@ -20,7 +18,7 @@ export interface Breed {
     categoria: Categoria;
     img: string;
     nombre: string;
-    tamanio: Size;
+    tamanio: Size[];
     nivel_energia?: Nivel;
     necesidad_ejercicio?: Nivel;
     ejercicio_horas?: string;

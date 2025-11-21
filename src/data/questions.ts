@@ -3,309 +3,251 @@ import type { Question } from "../types";
 export const questions: Question[] = [
     {
         id: "q_categoria",
-        text: " ¿es un perro o un gato?",
+        text: "¿Tu animal secreto es un Perro o un Gato?",
         factKey: "answer_categoria",
         type: "CHOICE",
         options: [
-            { text: "Perro", value: "perro" },
-            { text: "Gato", value: "gato" }
+            { text: "Es un Perro", value: "perro" },
+            { text: "Es un Gato", value: "gato" }
         ],
         mandatory: true,
         priority: 0,
         appliesTo: "both"
     },
     {
-        id: "q_tamanio",
-        text: "¿Qué tamaño aproximado tiene?",
-        factKey: "answer_tamanio",
-        type: "CHOICE",
-        options: [
-            { text: "Muy pequeño (toy)", value: "pequeño" },
-            { text: "Pequeño / Mediano", value: "pequeño/mediano" },
-            { text: "Mediano", value: "mediano" },
-            { text: "Mediano / Grande", value: "mediano/grande" },
-            { text: "Grande", value: "grande" },
-            { text: "Muy grande / Gigante", value: "muy grande" }
-        ],
+        id: "q_hipo",
+        text: "¿Es una raza hipoalergénica?",
+        factKey: "answer_hipoalergenico",
+        type: "YESNO",
         priority: 1,
         appliesTo: "both"
     },
-
     {
-        id: "q_rasgos_fisicos_text",
-        text: "¿Qué rasgos físicos destacarías (elige el que más se le parezca)?",
-        factKey: "answer_rasgos_fisicos",
+        id: "q_tamanio",
+        text: "¿De qué tamaño es el animal?",
+        factKey: "answer_tamanio",
         type: "CHOICE",
         options: [
-            { text: "Orejas largas / caídas", value: "orejas_largas" },
-            { text: "Orejas erguidas / puntiagudas", value: "orejas_erguidas" },
-            { text: "Hocico largo", value: "hocico_largo" },
-            { text: "Hocico corto / cara chata", value: "cara_chata" },
-            { text: "Pelaje rizado / abundante", value: "pelaje_rizado" },
-            { text: "Pelaje corto y liso", value: "pelaje_corto" },
-            { text: "Sin pelo", value: "sin_pelo" },
-            { text: "Patrón moteado / manchas", value: "moteado" },
-            { text: "Otro / No sé", value: "otro" }
+            { text: "Pequeño / muy pequeño", value: "pequeño" },
+            { text: "Mediano", value: "mediano" },
+            { text: "Grande / muy grande", value: "grande" },
+            { text: "Gigante", value: "gigante" }
         ],
         priority: 2,
         appliesTo: "both"
     },
+
+    // EJERCICIO (5 niveles)
     {
-        id: "q_hipo",
-        text: "¿Es hipoalergénico?",
-        factKey: "answer_hipoalergenico",
-        type: "YESNO",
+        id: "q_ejercicio",
+        text: "¿Cuál es la **necesidad de ejercicio** del animal?",
+        factKey: "answer_necesidad_ejercicio",
+        type: "CHOICE",
+        options: [
+            { text: "Muy alta (Requiere actividad intensa diaria)", value: "muy alto" },
+            { text: "Alta (Requiere mucho ejercicio diario)", value: "alto" },
+            { text: "Media (Requiere ejercicio moderado)", value: "medio" },
+            { text: "Baja (Requiere poco ejercicio)", value: "bajo" },
+            { text: "Muy baja (Casi sin necesidad de ejercicio)", value: "muy bajo" },
+            { text: "No estoy seguro", value: "no_se" }
+        ],
+        priority: 3,
+        appliesTo: "both"
+    },
+
+    // SOLEDAD (usa alias alta/media/baja)
+    {
+        id: "q_soledad",
+        text: "¿Es un animal muy apegado o independiente? (**Tolerancia a la Soledad**)",
+        factKey: "answer_tolerancia_soledad",
+        type: "CHOICE",
+        options: [
+            { text: "Es muy apegado (Baja tolerancia a la soledad)", value: "baja_tolerancia" },
+            { text: "Es equilibrado", value: "media_tolerancia" },
+            { text: "Es muy independiente (Alta tolerancia a la soledad)", value: "alta_tolerancia" },
+            { text: "No estoy seguro", value: "no_se" }
+        ],
         priority: 4,
         appliesTo: "both"
     },
 
+    // BUENO CON NIÑOS (5 niveles)
     {
-        id: "q_muda",
-        text: "¿Muda mucho pelo?",
-        factKey: "answer_muda",
-        type: "YESNO",
+        id: "q_ninos",
+        text: "¿Qué tan **bueno es con niños**?",
+        factKey: "answer_bueno_con_ninos",
+        type: "CHOICE",
+        options: [
+            { text: "Muy alto (Extremadamente tolerante y protector)", value: "muy alto" },
+            { text: "Alto (Tolerante y protector)", value: "alto" },
+            { text: "Medio (Bueno, pero requiere supervisión)", value: "medio" },
+            { text: "Bajo (Requiere socialización, puede ser temperamental)", value: "bajo" },
+            { text: "Muy bajo (No recomendado con niños)", value: "muy bajo" },
+            { text: "No estoy seguro", value: "no_se" }
+        ],
         priority: 5,
         appliesTo: "both"
     },
 
+    // OTRAS MASCOTAS (5 niveles)
     {
-        id: "q_aseo_frecuente",
-        text: "¿No necesita aseo/peluquería frecuente?",
-        factKey: "answer_aseo_frecuente",
-        type: "YESNO",
+        id: "q_otras_mascotas",
+        text: "¿Qué tan bien se lleva con **otras mascotas**?",
+        factKey: "answer_acepta_otras_mascotas",
+        type: "CHOICE",
+        options: [
+            { text: "Muy alto (Muy sociable)", value: "muy alto" },
+            { text: "Alto (Generalmente amistoso y acepta otras mascotas)", value: "alto" },
+            { text: "Medio (Puede ser bueno, pero requiere socialización cuidadosa)", value: "medio" },
+            { text: "Bajo (Puede ser agresivo, territorial o con instinto de caza)", value: "bajo" },
+            { text: "Muy bajo (Problemas serios con otras especies)", value: "muy bajo" },
+            { text: "No estoy seguro", value: "no_se" }
+        ],
         priority: 6,
         appliesTo: "both"
     },
+
+    // LADRIDO / VOCALIZACIÓN (5 niveles)
     {
-        id: "q_nivel_energia",
-        text: "¿Qué nivel de energía tiene?",
-        factKey: "answer_nivel_energia",
+        id: "q_ladrido",
+        text: "¿Cuál es el nivel de **ladrido/vocalización** del animal?",
+        factKey: "answer_ladrido",
         type: "CHOICE",
         options: [
-            { text: "Muy alto / very active", value: "muy alto" },
-            { text: "Alto", value: "alto" },
-            { text: "Medio", value: "medio" },
-            { text: "Bajo", value: "bajo" },
-            { text: "Muy bajo / tranquilo", value: "muy bajo" }
+            { text: "Muy alto (Extremadamente vocal)", value: "muy alto" },
+            { text: "Alto (Muy vocal / Ladra mucho)", value: "alto" },
+            { text: "Medio (Ladra o vocaliza ocasionalmente)", value: "medio" },
+            { text: "Bajo (Rara vez ladra o vocaliza)", value: "bajo" },
+            { text: "Muy bajo (Casi silencioso)", value: "muy bajo" },
+            { text: "No estoy seguro", value: "no_se" }
         ],
         priority: 7,
         appliesTo: "both"
     },
 
+    // ASE0 (5 niveles)
     {
-        id: "q_necesidad_ejercicio",
-        text: "¿Cuánta actividad / ejercicio necesita?",
-        factKey: "answer_necesidad_ejercicio",
+        id: "q_aseo",
+        text: "¿Cuál es el **nivel de aseo** del animal?",
+        factKey: "answer_aseo",
         type: "CHOICE",
         options: [
-            { text: "Muy alta (más de 2 horas / mucho juego)", value: "muy alto" },
-            { text: "Alta (1-2 horas)", value: "alto" },
-            { text: "Media (30-60 min)", value: "medio" },
-            { text: "Baja (paseos cortos)", value: "bajo" },
-            { text: "Muy baja", value: "muy bajo" }
+            { text: "Muy alto (Requiere aseo diario/profesional)", value: "muy alto" },
+            { text: "Alto (Requiere aseo frecuente y detallado)", value: "alto" },
+            { text: "Medio (Requiere aseo regular)", value: "medio" },
+            { text: "Bajo (Requiere poco aseo)", value: "bajo" },
+            { text: "Muy bajo (Casi sin aseo requerido)", value: "muy bajo" },
+            { text: "No estoy seguro", value: "no_se" }
         ],
         priority: 8,
         appliesTo: "both"
     },
 
+    // MUDA (5 niveles)
     {
-        id: "q_ejercicio_horas",
-        text: "¿Cuánto ejercicio diario aproximado necesita?",
-        factKey: "answer_ejercicio_horas",
+        id: "q_muda",
+        text: "¿Cuál es el **nivel de muda** del animal?",
+        factKey: "answer_muda",
         type: "CHOICE",
         options: [
-            { text: "Más de 2 horas", value: "Más de 2 horas diarias" },
-            { text: "1-2 horas", value: "1-2 horas al día" },
-            { text: "Aprox. 1 hora / juegos", value: "Aprox. 1 hora al día" },
-            { text: "Media hora (paseos suaves)", value: "Media hora al día (paseos suaves)" },
-            { text: "Poca actividad", value: "Poca actividad; juego corto" }
+            { text: "Muy alto (Muda excesiva)", value: "muy alto" },
+            { text: "Alto (Muda abundante y frecuente)", value: "alto" },
+            { text: "Medio (Muda moderada)", value: "medio" },
+            { text: "Bajo (Muda mínima)", value: "bajo" },
+            { text: "Muy bajo (Casi sin muda)", value: "muy bajo" },
+            { text: "No estoy seguro", value: "no_se" }
         ],
         priority: 9,
         appliesTo: "both"
     },
+
+    // ADIESTRAMIENTO (5 niveles)
     {
-        id: "q_tolerancia_soledad",
-        text: "¿Qué tolerancia a la soledad tiene?",
-        factKey: "answer_tolerancia_soledad",
+        id: "q_adiestramiento",
+        text: "¿Qué tan fácil o difícil es su **adiestramiento**?",
+        factKey: "answer_adiestramiento",
         type: "CHOICE",
         options: [
-            { text: "Alta (soporta quedarse solo)", value: "alto" },
-            { text: "Media", value: "medio" },
-            { text: "Baja (necesita compañía)", value: "bajo" },
-            { text: "Muy baja (no tolera soledad)", value: "muy bajo" }
+            { text: "Muy alto (Aprende excepcionalmente rápido)", value: "muy alto" },
+            { text: "Alto (Aprende rápido y disfruta)", value: "alto" },
+            { text: "Medio (Necesita consistencia y un manejo firme)", value: "medio" },
+            { text: "Bajo (Difícil / Terco)", value: "bajo" },
+            { text: "Muy bajo (Extremadamente difícil)", value: "muy bajo" },
+            { text: "No estoy seguro", value: "no_se" }
         ],
         priority: 10,
         appliesTo: "both"
     },
 
+    // ENERGÍA (5 niveles)
     {
-        id: "q_ninos",
-        text: "¿Se lleva bien con niños?",
-        factKey: "answer_bueno_con_ninos",
-        type: "YESNO",
+        id: "q_energia",
+        text: "¿Cuál es el **nivel de energía** del animal?",
+        factKey: "answer_nivel_energia",
+        type: "CHOICE",
+        options: [
+            { text: "Muy alto (Muy, muy activo)", value: "muy alto" },
+            { text: "Alto (Activo / Enérgico)", value: "alto" },
+            { text: "Medio (Equilibrado / Moderado)", value: "medio" },
+            { text: "Bajo (Tranquilo / Poco activo)", value: "bajo" },
+            { text: "Muy bajo (Casi nulo)", value: "muy bajo" },
+            { text: "No estoy seguro", value: "no_se" }
+        ],
         priority: 11,
         appliesTo: "both"
     },
 
+    // FAMILIAR (5 niveles)
     {
-        id: "q_otras_mascotas",
-        text: "¿Se lleva bien con otras mascotas en casa?",
-        factKey: "answer_acepta_otras_mascotas",
-        type: "YESNO",
+        id: "q_familiar",
+        text: "¿Qué tan **familiar** es el animal?",
+        factKey: "answer_familiar",
+        type: "CHOICE",
+        options: [
+            { text: "Muy alto (Extremadamente afectuoso)", value: "muy alto" },
+            { text: "Alto (Muy afectuoso y cariñoso)", value: "alto" },
+            { text: "Medio (Afectuoso, pero independiente)", value: "medio" },
+            { text: "Bajo (Reservado o distante)", value: "bajo" },
+            { text: "Muy bajo (Muy distante)", value: "muy bajo" },
+            { text: "No estoy seguro", value: "no_se" }
+        ],
         priority: 12,
         appliesTo: "both"
     },
 
+    // JUGUETÓN (5 niveles)
     {
-        id: "q_vocal",
-        text: "¿Es muy vocal (ladra o maúlla mucho)?",
-        factKey: "answer_vocal",
-        type: "YESNO",
+        id: "q_jugueton",
+        text: "¿Cuál es el **nivel de juguetón** del animal?",
+        factKey: "answer_jugueton",
+        type: "CHOICE",
+        options: [
+            { text: "Muy alto (Siempre listo para jugar)", value: "muy alto" },
+            { text: "Alto (Le encanta jugar / muy activo)", value: "alto" },
+            { text: "Medio (Juega en momentos específicos o con moderación)", value: "medio" },
+            { text: "Bajo (Poco interesado en el juego)", value: "bajo" },
+            { text: "Muy bajo (Casi nunca juega)", value: "muy bajo" },
+            { text: "No estoy seguro", value: "no_se" }
+        ],
         priority: 13,
         appliesTo: "both"
     },
 
-    {
-        id: "q_ladra",
-        text: "¿Ladra mucho?",
-        factKey: "answer_ladra",
-        type: "YESNO",
-        priority: 14,
-        appliesTo: "perro"
-    },
-
-    {
-        id: "q_jugueton",
-        text: "¿Es juguetón / activo en juegos?",
-        factKey: "answer_jugueton",
-        type: "YESNO",
-        priority: 15,
-        appliesTo: "both"
-    },
-
+    // INTELIGENCIA (5 niveles)
     {
         id: "q_inteligencia",
-        text: "¿Qué nivel de inteligencia / capacidad de aprendizaje tiene?",
+        text: "¿Cómo calificarías su **inteligencia**?",
         factKey: "answer_inteligencia",
         type: "CHOICE",
         options: [
-            { text: "Muy alto", value: "muy alto" },
-            { text: "Alto", value: "alto" },
-            { text: "Medio", value: "medio" },
-            { text: "Bajo", value: "bajo" }
+            { text: "Muy alta (Resuelve problemas con facilidad)", value: "muy alto" },
+            { text: "Alta (Resuelve problemas fácilmente)", value: "alto" },
+            { text: "Media (Inteligencia estándar)", value: "medio" },
+            { text: "Baja (Requiere más repetición para aprender)", value: "bajo" },
+            { text: "Muy baja (Limitada capacidad de aprendizaje)", value: "muy bajo" },
+            { text: "No estoy seguro", value: "no_se" }
         ],
-        priority: 16,
+        priority: 14,
         appliesTo: "both"
-    },
-
-    {
-        id: "q_adiestrable",
-        text: "¿Es fácil de adiestrar?",
-        factKey: "answer_adiestrable",
-        type: "YESNO",
-        priority: 17,
-        appliesTo: "both"
-    },
-    {
-        id: "q_has_predisposition",
-        text: "¿Tiene alguna predisposición de salud en particular?",
-        factKey: "answer_tiene_predisposicion",
-        type: "YESNO",
-        priority: 18,
-        appliesTo: "both"
-    },
-
-    {
-        id: "q_predisposition_name",
-        text: "¿Qué predisposición tiene (o 'Otro / No sé')?",
-        factKey: "answer_predisposicion_nombre",
-        type: "CHOICE",
-        options: [
-            { text: "Displasia de cadera/codo", value: "Displasia de cadera/codo" },
-            { text: "Cardiomiopatía / problemas cardiacos", value: "Cardiomiopatía" },
-            { text: "Problemas oculares (cataratas, glaucoma)", value: "Problemas oculares" },
-            { text: "Braquicefalia / problemas respiratorios", value: "Braquicefalia" },
-            { text: "Atrofia retiniana / enfermedades genéticas", value: "Enfermedades genéticas" },
-            { text: "Dilatación gástrica / torsión", value: "Dilatación gástrica" },
-            { text: "Cáncer", value: "Cáncer" },
-            { text: "Otro / No sé", value: "otro_o_no_se" }
-        ],
-        priority: 19,
-        appliesTo: "both",
-    },
-
-    {
-        id: "q_wants_long_lived",
-        text: "¿Tiene una esperanza de vida larga?",
-        factKey: "answer_quiere_raza_longeva",
-        type: "YESNO",
-        priority: 20,
-        appliesTo: "both"
-    },
-    {
-        id: "q_rasgo_tag",
-        text: "¿Tiene algún rasgo físico identificado (tags) como 'sin_pelo', 'guantes_blancos', etc.?",
-        factKey: "answer_rasgo_tag",
-        type: "CHOICE",
-        options: [
-            { text: "No importa / No", value: "" },
-            { text: "Guantes blancos (patas con blanco)", value: "guantes_blancos" },
-            { text: "Ticked / Aguti", value: "ticked_aguti" },
-            { text: "Sin pelo", value: "sin_pelo" },
-            { text: "Orejas largas", value: "orejas_largas" },
-            { text: "Pelaje moteado / manchas", value: "moteado" },
-            { text: "Otro / No sé", value: "otro" }
-        ],
-        priority: 21,
-        appliesTo: "both"
-    },
-
-    {
-        id: "q_color",
-        text: "¿Qué color / patrón del pelaje tiene?",
-        factKey: "answer_color",
-        type: "CHOICE",
-        options: [
-
-            { text: "Tricolor / Multicolor", value: "tricolor" },
-            { text: "Manto dorado / amarillo", value: "dorado" },
-            { text: "Negro", value: "negro" },
-            { text: "Blanco / moteado", value: "moteado" },
-            { text: "Otro / No sé", value: "otro" }
-        ],
-        priority: 22,
-        appliesTo: "both"
-    },
-    {
-        id: "q_group",
-        text: "¿Tiene preferencia por el grupo de la raza (sólo perros)?",
-        factKey: "answer_grupo",
-        type: "CHOICE",
-        options: [
-
-            { text: "Herding (pastoreo)", value: "Herding" },
-            { text: "Sporting", value: "Sporting" },
-            { text: "Hound", value: "Hound" },
-            { text: "Working", value: "Working" },
-            { text: "Toy", value: "Toy" },
-            { text: "Non-Sporting", value: "Non-Sporting" },
-            { text: "Otro / No sé", value: "otro" }
-        ],
-        priority: 23,
-        appliesTo: "perro"
-    },
-
-    {
-        id: "q_orejas_perro",
-        text: "Para perros: ¿las orejas son erguidas o caídas (si lo sabes)?",
-        factKey: "answer_orejas",
-        type: "CHOICE",
-        options: [
-            { text: "Erguidas / puntiagudas", value: "erguidas" },
-            { text: "Caídas / largas", value: "caídas" },
-            { text: "No sé / indiferente", value: "" }
-        ],
-        priority: 24,
-        appliesTo: "perro"
     }
-] as const;
+];

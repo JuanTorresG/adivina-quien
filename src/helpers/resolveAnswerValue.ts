@@ -1,47 +1,45 @@
 import type { Question } from "../types";
-import { parseYesNoString } from "./parseYesNoString";
-import { isNoSeText } from "./isNoSeText";
+import { classifyYesNo } from "./";
 
-const normalize = (s: unknown) => {
-    if (s === null || s === undefined) return "";
-    return String(s).toLowerCase().normalize("NFD").replaceAll(/[\u0300-\u036f]/g, "").trim();
-};
-
-export const resolveAnswerValue = (question: Question, raw: boolean | string): boolean | string => {
-    if (typeof raw === "boolean") return raw;
-
-    const rawStr = String(raw).trim();
-    const norm = normalize(rawStr);
-
-    const yn = parseYesNoString(rawStr);
-    if (yn !== null && question.type === "YESNO") return yn;
-
-    if (Array.isArray(question.options) && question.options.length > 0) {
-        const byValue = question.options.find(o => normalize(String(o.value)) === norm);
-        if (byValue) {
-            const vnorm = normalize(String(byValue.value));
-            if (vnorm === "otro" || vnorm === "otro_o_no_se" || vnorm === "otro_o_no_sé") return "";
-            return byValue.value;
+export const resolveAnswerValue = (
+    userValue: string | boolean | number,
+    question: Question
+): string | boolean | number | string[] | null => {
+    if (typeof userValue === "boolean") {
+        if (question.type === "YESNO") {
+            return userValue;
         }
+        return userValue ? "si" : "no";
+    }
 
-        const byText = question.options.find(o => normalize(String(o.text ?? "")) === norm);
-        if (byText) {
-            const vnorm = normalize(String(byText.value));
-            if (vnorm === "otro" || vnorm === "otro_o_no_se" || vnorm === "otro_o_no_sé") return "";
-            return byText.value;
-        }
+    const lowerText = String(userValue).toLowerCase().trim();
 
-        if (isNoSeText(rawStr)) {
-            if (question.options.some(o => o.value === "")) return "";
-            const optOtro = question.options.find(o => {
-                const v = normalize(String(o.value));
-                return v === "otro" || v === "otro_o_no_se";
-            });
-            if (optOtro) return "";
+    if (question.type === "YESNO") {
+        const classification = classifyYesNo(lowerText);
+        if (classification === "true") return true;
+        if (classification === "false") return false;
+        return null;
+    }
+
+    if (question.type === "CHOICE" && question.options) {
+        for (const opt of question.options) {
+            const optText = opt.text.toLowerCase();
+            const optVal = String(opt.value).toLowerCase();
+
+            if (lowerText.includes(optVal) || lowerText.includes(optText)) {
+                return opt.value;
+            }
+
+            const keywords = optText
+                .split(/[\/\(\)]/)
+                .map((k) => k.trim())
+                .filter((k) => k.length > 2);
+
+            if (keywords.some((k) => lowerText.includes(k))) {
+                return opt.value;
+            }
         }
     }
 
-    if (isNoSeText(rawStr)) return "";
-
-    return rawStr;
+    return null;
 };

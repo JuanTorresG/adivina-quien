@@ -1,15 +1,10 @@
 import { Board } from './components/Board';
 import { Chat } from './components/Chat';
 import { breeds } from "./data/breeds";
-import { createEngine } from './engine/engine';
 import { useChat } from './hooks/useChat';
 
-const engine = createEngine();
-
-console.log(`Loaded ${breeds.length} breeds into the engine.`);
-console.log(breeds);
 const App = () => {
-  const { currentQuestion, gamePhase, handleUserAnswer, isCpuThinking, messages, restartGame, onGuestAnswer, possibleBreeds } = useChat({ engine, initialBreeds: breeds });
+  const { currentQuestion, gamePhase, handleUserAnswer, isCpuThinking, messages, restartGame, onGuestAnswer, possibleBreeds } = useChat({ initialBreeds: breeds });
 
   return (
     <div className='min-h-screen bg-slate-100 col-end-1 col-span-12 row-end-7 row-span-7 grid grid-cols-10 gap-4 p-4'>
