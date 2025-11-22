@@ -36,8 +36,6 @@ export const questions: Question[] = [
         priority: 2,
         appliesTo: "both"
     },
-
-    // EJERCICIO (5 niveles)
     {
         id: "q_ejercicio",
         text: "¿Cuál es la **necesidad de ejercicio** del animal?",
@@ -54,24 +52,22 @@ export const questions: Question[] = [
         priority: 3,
         appliesTo: "both"
     },
-
-    // SOLEDAD (usa alias alta/media/baja)
     {
         id: "q_soledad",
         text: "¿Es un animal muy apegado o independiente? (**Tolerancia a la Soledad**)",
         factKey: "answer_tolerancia_soledad",
         type: "CHOICE",
         options: [
-            { text: "Es muy apegado (Baja tolerancia a la soledad)", value: "baja_tolerancia" },
-            { text: "Es equilibrado", value: "media_tolerancia" },
-            { text: "Es muy independiente (Alta tolerancia a la soledad)", value: "alta_tolerancia" },
+            { text: "Muy alta ", value: "muy alto" },
+            { text: "Alta ", value: "alto" },
+            { text: "Media ", value: "medio" },
+            { text: "Baja", value: "bajo" },
+            { text: "Muy baja ", value: "muy bajo" },
             { text: "No estoy seguro", value: "no_se" }
         ],
         priority: 4,
         appliesTo: "both"
     },
-
-    // BUENO CON NIÑOS (5 niveles)
     {
         id: "q_ninos",
         text: "¿Qué tan **bueno es con niños**?",
@@ -88,8 +84,6 @@ export const questions: Question[] = [
         priority: 5,
         appliesTo: "both"
     },
-
-    // OTRAS MASCOTAS (5 niveles)
     {
         id: "q_otras_mascotas",
         text: "¿Qué tan bien se lleva con **otras mascotas**?",
@@ -106,8 +100,6 @@ export const questions: Question[] = [
         priority: 6,
         appliesTo: "both"
     },
-
-    // LADRIDO / VOCALIZACIÓN (5 niveles)
     {
         id: "q_ladrido",
         text: "¿Cuál es el nivel de **ladrido/vocalización** del animal?",
@@ -124,8 +116,6 @@ export const questions: Question[] = [
         priority: 7,
         appliesTo: "both"
     },
-
-    // ASE0 (5 niveles)
     {
         id: "q_aseo",
         text: "¿Cuál es el **nivel de aseo** del animal?",
@@ -142,8 +132,6 @@ export const questions: Question[] = [
         priority: 8,
         appliesTo: "both"
     },
-
-    // MUDA (5 niveles)
     {
         id: "q_muda",
         text: "¿Cuál es el **nivel de muda** del animal?",
@@ -160,8 +148,6 @@ export const questions: Question[] = [
         priority: 9,
         appliesTo: "both"
     },
-
-    // ADIESTRAMIENTO (5 niveles)
     {
         id: "q_adiestramiento",
         text: "¿Qué tan fácil o difícil es su **adiestramiento**?",
@@ -178,8 +164,6 @@ export const questions: Question[] = [
         priority: 10,
         appliesTo: "both"
     },
-
-    // ENERGÍA (5 niveles)
     {
         id: "q_energia",
         text: "¿Cuál es el **nivel de energía** del animal?",
@@ -196,8 +180,6 @@ export const questions: Question[] = [
         priority: 11,
         appliesTo: "both"
     },
-
-    // FAMILIAR (5 niveles)
     {
         id: "q_familiar",
         text: "¿Qué tan **familiar** es el animal?",
@@ -214,8 +196,6 @@ export const questions: Question[] = [
         priority: 12,
         appliesTo: "both"
     },
-
-    // JUGUETÓN (5 niveles)
     {
         id: "q_jugueton",
         text: "¿Cuál es el **nivel de juguetón** del animal?",
@@ -232,8 +212,6 @@ export const questions: Question[] = [
         priority: 13,
         appliesTo: "both"
     },
-
-    // INTELIGENCIA (5 niveles)
     {
         id: "q_inteligencia",
         text: "¿Cómo calificarías su **inteligencia**?",

@@ -5,7 +5,7 @@ export const breeds: Breed[] = [
         categoria: "perro",
         img: "pastor-aleman.jpeg",
         nombre: "Pastor Alemán",
-        tamanio: ["grande"],
+        tamanio: ["grande",],
         nivel_energia: "muy alto",
         necesidad_ejercicio: "muy alto",
         ejercicio_horas: "Más de 2 horas diarias",
